@@ -1,29 +1,30 @@
 <?php
 
 // Plugin API Class
-class woo_shophacker_api {
+class woo_shop_hacker_api {
+
 
 	// Endpoint
 	static $endpoint = 'https://api.shophacker.com/';
 
+
 	// Makes Auth Header
 	static function get_header( $args = [] ) {
-		$apikey = get_option( 'woo_shophacker_apikey' );
-		$apisecret = get_option( 'woo_shophacker_apisecret' );
+		$apikey = get_option( 'woo_shop_hacker_apikey' );
+		$apisecret = get_option( 'woo_shop_hacker_apisecret' );
 		$credentials = sprintf( "%s:%s", $apikey, $apisecret );
 		return array_merge( $args, [
-			'headers' => array(
-				'Authorization' => 'Basic ' . base64_encode( $credentials ),
-			)
+			'headers' => [ 'Authorization' => 'Basic ' . base64_encode( $credentials ) ]
 		] );
 	}
 
+
 	// Get All Products
 	static function get_products() {
-		$mid = get_option( 'woo_shophacker_merchantid' );
-		$args = ['page' => 1, 'merchant_id' => $mid ];
-		$url = woo_shophacker_api::$endpoint . 'products?' . http_build_query( $args );
-		$header = woo_shophacker_api::get_header();
+		$mid = get_option( 'woo_shop_hacker_merchantid' );
+		$args = [ 'page' => 1, 'merchant_id' => $mid ];
+		$url = woo_shop_hacker_api::$endpoint . 'products?' . http_build_query( $args );
+		$header = woo_shop_hacker_api::get_header();
 		$response = wp_remote_get( $url, $header );
 
 		// Handle Bad Response
@@ -35,13 +36,18 @@ class woo_shophacker_api {
 		// Handle Good Response
 		return json_decode( $response['body'] );
 	}
+
 
 	// Search Products
 	static function get_search_results( $query = '' ) {
-		$mid = get_option( 'woo_shophacker_merchantid' );
+		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$args = ['q' => $query, 'merchant_id' => $mid ];
-		$url = woo_shophacker_api::$endpoint . 'products-search?' . http_build_query( $args );
-		$header = woo_shophacker_api::get_header();
+		$url = sprintf(
+			"%sproducts-search?%s",
+			woo_shop_hacker_api::$endpoint,
+			http_build_query( $args )
+		);
+		$header = woo_shop_hacker_api::get_header();
 		$response = wp_remote_get( $url, $header );
 
 		// Handle Bad Response
@@ -53,6 +59,7 @@ class woo_shophacker_api {
 		// Handle Good Response
 		return json_decode( $response['body'] );
 	}
+
 
 	// Save Sale
 	static function save_sale( $productID, $name, $email ) {
@@ -63,15 +70,15 @@ class woo_shophacker_api {
 		}
 
 		// Transmit Order
-		$url = woo_shophacker_api::$endpoint . 'salesRequest';
-		$args = woo_shophacker_api::get_header( [ 'Content-Type:' => 'application/json' ] );
-		$mid = get_option( 'woo_shophacker_merchantid' );
+		$url = woo_shop_hacker_api::$endpoint . 'salesRequest';
+		$args = woo_shop_hacker_api::get_header( [ 'Content-Type:' => 'application/json' ] );
+		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$body = [
 			'sale' => [
-				'shop_hacker_product_id' => $productID,
-				'customer_full_name' => $name,
 				'customer_email' => $email,
+				'customer_full_name' => $name,
 				'merchant_id' => $mid,
+				'shop_hacker_product_id' => $productID,
 			]
 		];
 		$args['body'] = json_encode( $body );
@@ -87,6 +94,7 @@ class woo_shophacker_api {
 		$response = json_decode( $response['body'] );
 		return isset( $response->sale_builder_id ) ? intval( $response->sale_builder_id ) : false;
 	}
+
 
 // End Plugin API Class
 }

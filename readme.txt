@@ -1,7 +1,7 @@
-=== Woo Benchmark Email ===
+=== Woo Shop Hacker ===
 Contributors: seanconklin
 Donate link: https://codedcommerce.com/donate
-Tags: WooCommerce, Shop Hacker, affiliate, digital downloads
+Tags: WooCommerce, Shop Hacker, affiliate, digital downloads, ShopHacker
 Requires at least: 4.0.1
 Tested up to: 5.0
 Requires PHP: 5.6
@@ -13,20 +13,20 @@ Connects WooCommerce with Shop Hacker - syncing products into Woo.
 
 == Description ==
 
-[youtube https://www.youtube.com/watch?v=v9cDjvtrjrc]
+Connects WooCommerce with Shop Hacker - syncing products into Woo.
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/woo-shophacker` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/woo-shop-hacker` directory, or install the plugin through the WordPress plugins screen directly.
 1. Activate the plugin through the 'Plugins' screen in WordPress
-1. Use the `WooCommerce->Settings->Advanced->Shop Hacker` screen to configure the plugin
+1. Use the `WooCommerce->Settings->Shop Hacker` screen to configure the plugin
 
 == Screenshots ==
 
 
 == Changelog ==
 
-= 1.0 on 2018-10-00 =
+= 1.0 on 2018-11-11 =
 * Initial release
 
 == Upgrade Notice ==

@@ -1,7 +1,8 @@
 <?php
 
 // Plugin Builder Class
-class woo_shophacker_builder {
+class woo_shop_hacker_builder {
+
 
 	// Search Form
 	static function init() {
@@ -12,11 +13,11 @@ class woo_shophacker_builder {
 			<tbody>
 				<tr valign="top">
 					<th scope="row" class="titledesc">
-						<label for="woo_shophacker_query"><?php _e( 'Search Query', 'woo-shophacker' ); ?></label>
+						<label for="woo_shop_hacker_query"><?php _e( 'Search Query', 'woo-shop-hacker' ); ?></label>
 					</th>
 					<td class="forminp forminp-number">
 						<p>
-							<input type="text" id="woo_shophacker_query" name="query" value="" />
+							<input type="text" id="woo_shop_hacker_query" name="query" value="" />
 							<input class="button-secondary" type="submit" value="Search Products" />
 						</p>
 					</td>
@@ -27,6 +28,7 @@ class woo_shophacker_builder {
 	<?php
 	}
 
+
 	// Search Processor
 	static function search() {
 
@@ -36,7 +38,7 @@ class woo_shophacker_builder {
 
 		// Run Query
 		if( $query ) {
-			$response = woo_shophacker_api::get_search_results( $query );
+			$response = woo_shop_hacker_api::get_search_results( $query );
 			$products = isset( $response->products ) ? $response->products : [];
 			$meta = isset( $response->meta ) ? $response->meta : '';
 			$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
@@ -63,6 +65,7 @@ class woo_shophacker_builder {
 			<?php
 		}	
 	}
+
 
 // End Plugin Builder Class
 }
