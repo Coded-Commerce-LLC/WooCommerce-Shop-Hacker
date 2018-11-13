@@ -32,6 +32,7 @@ if(
 	require_once( 'class.settings.php' );
 
 	// Plugin Hooks
-	add_action( 'woo_shop_hacker_settings_after', [ 'woo_shop_hacker_builder', 'init' ] );
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [ 'woo_shop_hacker_settings', 'plugin_action_links' ] );
+	add_action( 'woo_shop_hacker_settings_after', [ 'woo_shop_hacker_builder', 'woo_shop_hacker_settings_after' ] );
+
 }

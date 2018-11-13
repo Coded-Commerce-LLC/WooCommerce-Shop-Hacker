@@ -65,7 +65,7 @@ class woo_shop_hacker_settings {
 			],
 			'apisecret' => [
 				'name' => __( 'API Secret', 'woo-shop-hacker' ),
-				'type' => 'password',
+				'type' => 'text',
 				'id' => 'woo_shop_hacker_apisecret'
 			],
 			'section_end' => [

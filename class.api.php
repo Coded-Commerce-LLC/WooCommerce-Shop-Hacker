@@ -39,9 +39,9 @@ class woo_shop_hacker_api {
 
 
 	// Search Products
-	static function get_search_results( $query = '' ) {
+	static function get_search_results( $query = '', $page = 1 ) {
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
-		$args = ['q' => $query, 'merchant_id' => $mid ];
+		$args = ['q' => $query, 'merchant_id' => $mid, 'page' => $page ];
 		$url = sprintf(
 			"%sproducts-search?%s",
 			woo_shop_hacker_api::$endpoint,
