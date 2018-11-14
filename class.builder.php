@@ -9,14 +9,20 @@ class woo_shop_hacker_builder {
 	static $total_records = 0;
 
 
-	// Section Contents
-	static function woo_shop_hacker_settings_after() {
-
-		// Ensure Plugin Is Configured
+	// Test Plugin Settings
+	static function is_configured() {
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$apikey = get_option( 'woo_shop_hacker_apikey' );
 		$apisecret = get_option( 'woo_shop_hacker_apisecret' );
-		if( ! $mid || ! $apikey || ! $apisecret ) { return []; }
+		return ( $mid && $apikey && $apisecret );
+	}
+
+
+	// Section Contents
+	static function woo_shop_hacker_settings_before() {
+
+		// Ensure Plugin Is Configured
+		if( ! self::is_configured() ) { return []; }
 
 		// Get Search Results
 		$query = isset( $_REQUEST['query'] ) ? sanitize_text_field( $_REQUEST['query'] ) : '';
@@ -28,105 +34,66 @@ class woo_shop_hacker_builder {
 		if( $page > 2 ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
-				1, $query, __( '&laquo; First Page', 'woo-shop-hacker' )
+				1, $query, '&laquo; ' . __( 'First Page', 'woo-shop-hacker' )
 			);
 		}
 		if( $page > 1 ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
-				$page - 1, $query, __( '&laquo; Prev Page', 'woo-shop-hacker' )
+				$page - 1, $query, '&laquo; ' . __( 'Previous Page', 'woo-shop-hacker' )
 			);
 		}
 		if( $page < self::$total_pages ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
-				$page + 1, $query, __( 'Next Page &raquo;', 'woo-shop-hacker' )
+				$page + 1, $query, __( 'Next Page', 'woo-shop-hacker' ) . '  &raquo;'
 			);
 		}
 		if( $page < self::$total_pages - 1 ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
-				self::$total_pages, $query, __( 'Last Page &raquo;', 'woo-shop-hacker' )
+				self::$total_pages, $query, __( 'Last Page', 'woo-shop-hacker' ) .  ' &raquo;'
 			);
 		}
 
 		// Search Form
-		?>
-		<h2>Shop Hacker Inventory</h2>
-		<table class="form-table">
-			<tbody>
-				<tr valign="top">
-					<th scope="row" class="titledesc">
-						<label for="woo_shop_hacker_query"><?php _e( 'Search Products', 'woo-shop-hacker' ); ?></label>
-					</th>
-					<td class="forminp forminp-number">
-						<p>
-							<input type="text" id="woo_shop_hacker_query" name="query" value="" />
-							<input class="button-secondary" type="submit" value="Search Products" />
-						</p>
-					</td>
-				</tr>
-
-				<?php if( $products ) { ?>
-				<tr valign="top">
-					<th scope="row" class="titledesc">
-						<label for="woo_shop_hacker_query"><?php _e( 'Add to Store', 'woo-shop-hacker' ); ?></label>
-					</th>
-					<td class="forminp forminp-number">
-
-						<?php
-						foreach( $products as $product ) {
-
-							// Get Description
-							$description = '';
-							foreach( $product->product_line_items as $val ) {
-								$description .= str_replace( '"', '\\"', preg_replace( "/[\n\r]/", "", $val->description ) );
-							}
-
-							// Output
-							echo sprintf(
-								'
-									<div>
-										<p>
-											<label title="%s"><input type="checkbox" name="product[]" value="%d" />
-												<a href="#" onclick="pop%d(); return false;" class="dashicons dashicons-external"></a> %s
-											</label>
-											<script>
-												function pop%d() {
-													var pop%d = window.open( "", "Product-Window", "width=800,height=500" );
-													pop%d.document.write( "%s" );
-												}
-											</script>
-										</p>
-									</div>
-								',
-								$product->bundle_headline,
-								$product->id,
-								$product->id,
-								trim( $product->name ),
-								$product->id,
-								$product->id,
-								$product->id,
-								sprintf( "<html><head><title>%s</title></head><body>%s</body></html>", trim( $product->name ), $description )
-							);
-						}
-						?>
-
-						<br />
-						<p>
-							<input class="button-secondary" type="submit" value="Add to Store" /> &nbsp;
-							<?php echo implode( ' &nbsp; ', $pagination ); ?>
-						</p>
-					</td>
-				</tr>
-				<?php } ?>
-
-			</tbody>
-		</table>
-		<?php
+		include( 'view.inventory.html.php' );
 
 		// Return Settings
 		return [];	
+	}
+
+
+	// Product HTML
+	static function print_product( $product ) {
+
+		// Get Description
+		$description = '';
+		foreach( $product->product_line_items as $val ) {
+			$description = $val->description;
+		}
+
+		// Output
+		echo sprintf(
+			'
+				<dt>
+					<label>
+						<input type="checkbox" name="add_product[]" value="%d" /> <strong>%s</strong>
+						<a href="#" onclick="jQuery( \'#pop%d\' ).toggle( \'slow\' ); return false;" class="dashicons dashicons-sort"></a><br />
+					</label>
+				</dt>
+				<dd>
+					<small>%s</small>
+					<div id="pop%d" class="shop_hacker_product_details">%s</div>
+				</dd>
+			',
+			$product->id,
+			trim( $product->name ),
+			$product->id,
+			$product->bundle_headline,
+			$product->id,
+			$description
+		);
 	}
 
 
@@ -142,7 +109,7 @@ class woo_shop_hacker_builder {
 		self::$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
 		self::$total_records = isset( $meta->total_records ) ? intval( $meta->total_records ) : 0;
 
-		// Return Results
+		// Return Products
 		return $products;
 	}
 

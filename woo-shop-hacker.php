@@ -12,7 +12,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 3.0
- * WC tested up to: 3.4.5
+ * WC tested up to: 3.5.0
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -33,6 +33,6 @@ if(
 
 	// Plugin Hooks
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [ 'woo_shop_hacker_settings', 'plugin_action_links' ] );
-	add_action( 'woo_shop_hacker_settings_after', [ 'woo_shop_hacker_builder', 'woo_shop_hacker_settings_after' ] );
+	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'woo_shop_hacker_settings_before' ] );
 
 }
