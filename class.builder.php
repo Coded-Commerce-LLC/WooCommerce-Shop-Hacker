@@ -4,11 +4,6 @@
 class woo_shop_hacker_builder {
 
 
-	// Class Properties
-	static $total_pages = 0;
-	static $total_records = 0;
-
-
 	// Test Plugin Settings
 	static function is_configured() {
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
@@ -19,7 +14,7 @@ class woo_shop_hacker_builder {
 
 
 	// Section Contents
-	static function woo_shop_hacker_settings_before() {
+	static function print_search_form() {
 
 		// Ensure Plugin Is Configured
 		if( ! self::is_configured() ) { return []; }
@@ -34,11 +29,11 @@ class woo_shop_hacker_builder {
 
 		// Get Meta Data
 		$meta = isset( $response->meta ) ? $response->meta : '';
-		self::$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
-		self::$total_records = isset( $meta->total_records ) ? intval( $meta->total_records ) : 0;
+		$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
+		$total_records = isset( $meta->total_records ) ? intval( $meta->total_records ) : 0;
 
 		// Get Pagination
-		$pagination = [ sprintf( 'Page: %d of %d', $page, self::$total_pages ) ];
+		$pagination = [ sprintf( 'Page: %d of %d', $page, $total_pages ) ];
 		if( $page > 2 ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
@@ -51,20 +46,20 @@ class woo_shop_hacker_builder {
 				$page - 1, $query, '&laquo; ' . __( 'Previous Page', 'woo-shop-hacker' )
 			);
 		}
-		if( $page < self::$total_pages ) {
+		if( $page < $total_pages ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
 				$page + 1, $query, __( 'Next Page', 'woo-shop-hacker' ) . '  &raquo;'
 			);
 		}
-		if( $page < self::$total_pages - 1 ) {
+		if( $page < $total_pages - 1 ) {
 			$pagination[] = sprintf(
 				'<a href="admin.php?page=wc-settings&tab=settings_tab_shop_hacker&paginate=%d&query=%s">%s</a>',
-				self::$total_pages, $query, __( 'Last Page', 'woo-shop-hacker' ) .  ' &raquo;'
+				$total_pages, $query, __( 'Last Page', 'woo-shop-hacker' ) .  ' &raquo;'
 			);
 		}
 
-		// Search Form
+		// Search Form And Results
 		include( 'view.inventory.html.php' );
 
 		// Return Settings
@@ -77,8 +72,10 @@ class woo_shop_hacker_builder {
 
 		// Get Description
 		$description = '';
-		foreach( $product->product_line_items as $val ) {
-			$description = $val->description;
+		if( $product->product_line_items ) {
+			foreach( $product->product_line_items as $val ) {
+				$description = $val->description;
+			}
 		}
 
 		// Output
@@ -102,6 +99,51 @@ class woo_shop_hacker_builder {
 			$product->id,
 			$description
 		);
+	}
+
+
+	// Add Product To Woo
+	static function add_products() {
+		$add_product = isset( $_REQUEST['add_product'] ) ? $_REQUEST['add_product'] : [];
+
+		// Loop Products Being Added
+		foreach( $add_product as $id ) {
+
+			// Get Product
+			$response = woo_shop_hacker_api::get_product( $id );
+			$bundle_headline = isset( $response->product->bundle_headline ) ? $response->product->bundle_headline : '';
+			$bundle_pricing = isset( $response->product->bundle_pricing ) ? $response->product->bundle_pricing : '';
+			$name = isset( $response->product->name ) ? $response->product->name : '';
+			$product_line_items = isset( $response->product->product_line_items ) ? $response->product->product_line_items : [];
+			$square_img_url = isset( $response->product->square_img_url ) ? $response->product->square_img_url : '';
+
+			// Get Description
+			$description = '';
+			if( $response->product->product_line_items ) {
+				foreach( $response->product->product_line_items as $val ) {
+					$description = $val->description;
+				}
+			}
+
+			// Add Into Woo
+			$data = [
+				//'categories' => [],
+				'description' => $description,
+				'images' => [ [ 'src' => $square_img_url, 'position' => 0 ] ],
+				'name' => $name,
+				'regular_price' => number_format( $bundle_pricing, 2 ),
+				'short_description' => $bundle_headline,
+				'status' => 'draft',
+				'type' => 'simple',
+			];
+			$request = new WP_REST_Request( 'POST' );
+			$request->set_body_params( $data );
+			$products_controller = new WC_REST_Products_Controller;
+			$response = $products_controller->create_item( $request );
+
+			// Response
+			echo sprintf( "<p>Added <strong>%s</strong> to your store in Draft status. Please review and publish.</p>", $name );
+		}
 	}
 
 

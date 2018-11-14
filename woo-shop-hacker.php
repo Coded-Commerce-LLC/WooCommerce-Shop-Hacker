@@ -33,6 +33,7 @@ if(
 
 	// Plugin Hooks
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [ 'woo_shop_hacker_settings', 'plugin_action_links' ] );
-	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'woo_shop_hacker_settings_before' ] );
+	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'add_products' ] );
+	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'print_search_form' ] );
 
 }

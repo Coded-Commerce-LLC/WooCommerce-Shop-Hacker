@@ -19,6 +19,25 @@ class woo_shop_hacker_api {
 	}
 
 
+	// Gets Single Product
+	static function get_product( $id ) {
+		$mid = get_option( 'woo_shop_hacker_merchantid' );
+		$args = [ 'merchant_id' => $mid ];
+		$url = woo_shop_hacker_api::$endpoint . 'products/' . intval( $id ) . '?' . http_build_query( $args );
+		$header = woo_shop_hacker_api::get_header();
+		$response = wp_remote_get( $url, $header );
+
+		// Handle Bad Response
+		if( empty( $response['body'] ) ) {
+			print_r( $response );
+			return false;
+		}
+
+		// Handle Good Response
+		return json_decode( $response['body'] );
+	}
+
+
 	// Get All Products
 	static function get_products() {
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
