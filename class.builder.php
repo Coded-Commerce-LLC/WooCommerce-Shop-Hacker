@@ -79,7 +79,7 @@ class woo_shop_hacker_builder {
 			}
 		}
 
-		// Disablement
+		// Get Preexistence Status
 		$product_match = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value = 'SH-%d' LIMIT 1",
@@ -89,7 +89,7 @@ class woo_shop_hacker_builder {
 		$disabled = $product_match ? 'disabled="disabled"' : '';
 		$title = $product_match ? __( 'This product exists in your store', 'woo-shop-hacker' ) : '';
 
-		// Output
+		// Output Row
 		echo sprintf(
 			'
 				<dt>
@@ -116,15 +116,18 @@ class woo_shop_hacker_builder {
 	}
 
 
-	// Add Product To Woo
+	// Add Product Into Woo
 	static function add_products() {
+
+		// Verify Required Data
 		$add_product = isset( $_REQUEST['add_product'] ) ? $_REQUEST['add_product'] : [];
+		if( ! is_array( $add_product ) ) { return false; }
 
 		// Loop Products Being Added
-		foreach( $add_product as $id ) {
+		foreach( $add_product as $product_id ) {
 
 			// Get Product
-			$response = woo_shop_hacker_api::get_product( $id );
+			$response = woo_shop_hacker_api::get_product( $product_id );
 			$bundle_headline = isset( $response->product->bundle_headline ) ? $response->product->bundle_headline : '';
 			$bundle_pricing = isset( $response->product->bundle_pricing ) ? $response->product->bundle_pricing : '';
 			$name = isset( $response->product->name ) ? $response->product->name : '';
@@ -141,13 +144,12 @@ class woo_shop_hacker_builder {
 
 			// Add Into Woo
 			$data = [
-				//'categories' => [],
 				'description' => $description,
 				'images' => [ [ 'src' => $square_img_url, 'position' => 0 ] ],
 				'name' => $name,
 				'regular_price' => number_format( $bundle_pricing, 2 ),
 				'short_description' => $bundle_headline,
-				'sku' => 'SH-' . $id,
+				'sku' => 'SH-' . $product_id,
 				'status' => 'draft',
 				'type' => 'simple',
 			];
@@ -156,8 +158,19 @@ class woo_shop_hacker_builder {
 			$products_controller = new WC_REST_Products_Controller;
 			$response = $products_controller->create_item( $request );
 
-			// Response
-			echo sprintf( "<p>Added <strong>%s</strong> to your store in Draft status. Please review and publish.</p>", $name );
+			// Handle Bad Response
+			if( ! isset( $response->data['id'] ) ) {
+				print_r( $response );
+				return false;
+			}
+
+			// Success Message
+			echo sprintf(
+				'<div class="notice notice-success"><p><strong><a href="post.php?post=%d&action=edit">%s</a></strong> %s</p></div>',
+				intval( $response->data['id'] ),
+				$name,
+				__( 'was added to your store in Draft status. Please review and publish.', 'woo-shop-hacker' )
+			);
 		}
 	}
 

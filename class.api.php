@@ -4,23 +4,29 @@
 class woo_shop_hacker_api {
 
 
-	// Endpoint
+	// Class Properties
 	static $endpoint = 'https://api.shophacker.com/';
 
 
-	// Makes Auth Header
+	// Builds Request Header
 	static function get_header( $args = [] ) {
 		$apikey = get_option( 'woo_shop_hacker_apikey' );
 		$apisecret = get_option( 'woo_shop_hacker_apisecret' );
 		$credentials = sprintf( "%s:%s", $apikey, $apisecret );
-		return array_merge( $args, [
-			'headers' => [ 'Authorization' => 'Basic ' . base64_encode( $credentials ) ]
-		] );
+		return array_merge( [
+			'headers' => [ 'Authorization' => 'Basic ' . base64_encode( $credentials ) ],
+			'timeout' => 10,
+		], $args );
 	}
 
 
 	// Gets Single Product
 	static function get_product( $id ) {
+
+		// Verify Required Data
+		if( ! intval( $id ) ) { return false; }
+
+		// Query Product
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$args = [ 'merchant_id' => $mid ];
 		$url = woo_shop_hacker_api::$endpoint . 'products/' . intval( $id ) . '?' . http_build_query( $args );
@@ -28,27 +34,11 @@ class woo_shop_hacker_api {
 		$response = wp_remote_get( $url, $header );
 
 		// Handle Bad Response
-		if( empty( $response['body'] ) ) {
-			print_r( $response );
-			return false;
-		}
-
-		// Handle Good Response
-		return json_decode( $response['body'] );
-	}
-
-
-	// Get All Products
-	static function get_products() {
-		$mid = get_option( 'woo_shop_hacker_merchantid' );
-		$args = [ 'page' => 1, 'merchant_id' => $mid ];
-		$url = woo_shop_hacker_api::$endpoint . 'products?' . http_build_query( $args );
-		$header = woo_shop_hacker_api::get_header();
-		$response = wp_remote_get( $url, $header );
-
-		// Handle Bad Response
-		if( empty( $response['body'] ) ) {
-			print_r( $response );
+		if( is_wp_error( $response ) || empty( $response['body'] ) ) {
+			echo sprintf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				print_r( $response, true )
+			);
 			return false;
 		}
 
@@ -59,6 +49,11 @@ class woo_shop_hacker_api {
 
 	// Search Products
 	static function get_search_results( $query = '', $page = 1 ) {
+
+		// Verify Required Data
+		if( ! $query ) { return false; }
+
+		// Run Search
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$args = ['q' => $query, 'merchant_id' => $mid, 'page' => $page ];
 		$url = sprintf(
@@ -70,8 +65,11 @@ class woo_shop_hacker_api {
 		$response = wp_remote_get( $url, $header );
 
 		// Handle Bad Response
-		if( empty( $response['body'] ) ) {
-			print_r( $response );
+		if( is_wp_error( $response ) || empty( $response['body'] ) ) {
+			echo sprintf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				print_r( $response, true )
+			);
 			return false;
 		}
 
@@ -83,7 +81,7 @@ class woo_shop_hacker_api {
 	// Save Sale
 	static function save_sale( $productID, $name, $email ) {
 
-		// Verify Data
+		// Verify Required Data
 		if( ! $productID || ! $name || ! $email ) {
 			return false;
 		}
@@ -104,8 +102,11 @@ class woo_shop_hacker_api {
 		$response = wp_remote_post( $url, $args );
 
 		// Handle Bad Response
-		if( empty( $response['body'] ) ) {
-			print_r( $response );
+		if( is_wp_error( $response ) || empty( $response['body'] ) ) {
+			echo sprintf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				print_r( $response, true )
+			);
 			return false;
 		}
 

@@ -9,11 +9,11 @@ Stable tag: 1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Connects WooCommerce with Shop Hacker - syncing products into Woo.
+Connects WooCommerce with Shop Hacker API.
 
 == Description ==
 
-Connects WooCommerce with Shop Hacker - syncing products into Woo.
+Connects WooCommerce with Shop Hacker API - syncing selected digital products into Woo for sales and fulfillment.
 
 == Installation ==
 
@@ -26,7 +26,7 @@ Connects WooCommerce with Shop Hacker - syncing products into Woo.
 
 == Changelog ==
 
-= 1.0 on 2018-11-11 =
+= 1.0 on 2018-11-15 =
 * Initial release
 
 == Upgrade Notice ==
