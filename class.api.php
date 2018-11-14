@@ -90,7 +90,7 @@ class woo_shop_hacker_api {
 		}
 
 		// Assemble Order Request
-		$url = woo_shop_hacker_api::$endpoint . 'salesRequest';
+		$url = woo_shop_hacker_api::$endpoint . 'sales';
 		$args = woo_shop_hacker_api::get_header();
 		$mid = get_option( 'woo_shop_hacker_merchantid' );
 		$body = [
@@ -112,7 +112,7 @@ class woo_shop_hacker_api {
 				'<div class="notice notice-error"><p>%s</p></div>',
 				print_r( $response, true )
 			);
-			return false;
+			return print_r( $response, true ); //false;
 		}
 
 		// Handle Good Response

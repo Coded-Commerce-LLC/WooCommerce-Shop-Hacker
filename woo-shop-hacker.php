@@ -29,11 +29,14 @@ if(
 	// Include Files
 	require_once( 'class.api.php' );
 	require_once( 'class.builder.php' );
+	require_once( 'class.order-actions.php' );
 	require_once( 'class.settings.php' );
 
 	// Plugin Hooks
 	add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [ 'woo_shop_hacker_settings', 'plugin_action_links' ] );
 	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'add_products' ] );
 	add_action( 'woo_shop_hacker_settings_before', [ 'woo_shop_hacker_builder', 'print_search_form' ] );
+	add_action( 'woocommerce_order_actions', [ 'woo_shop_hacker_order_actions', 'woocommerce_order_actions' ] );
+	add_action( 'woocommerce_order_action_shop_hacker_send', [ 'woo_shop_hacker_order_actions', 'woocommerce_order_action' ] );
 
 }
