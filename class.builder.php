@@ -133,6 +133,7 @@ class woo_shop_hacker_builder {
 				'name' => $name,
 				'regular_price' => number_format( $bundle_pricing, 2 ),
 				'short_description' => $bundle_headline,
+				'sku' => 'SH-' . $id,
 				'status' => 'draft',
 				'type' => 'simple',
 			];
