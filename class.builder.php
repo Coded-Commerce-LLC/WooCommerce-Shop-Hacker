@@ -100,7 +100,9 @@ class woo_shop_hacker_builder {
 					</label>
 				</dt>
 				<dd>
-					<small>%s</small>
+					<p>
+						<small>%s: $%s – %s</small>
+					</p>
 					<div id="pop%d" class="shop_hacker_product_details">%s</div>
 				</dd>
 			',
@@ -109,6 +111,8 @@ class woo_shop_hacker_builder {
 			$disabled,
 			trim( $product->name ),
 			$product->id,
+			__( 'Cost', 'woo-shop-hacker' ),
+			number_format( $product->bundle_pricing, 2 ),
 			$product->bundle_headline,
 			$product->id,
 			$description
@@ -152,6 +156,7 @@ class woo_shop_hacker_builder {
 				'sku' => 'SH-' . $product_id,
 				'status' => 'draft',
 				'type' => 'simple',
+				'virtual' => true,
 			];
 			$request = new WP_REST_Request( 'POST' );
 			$request->set_body_params( $data );
