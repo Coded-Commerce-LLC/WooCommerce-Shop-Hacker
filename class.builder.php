@@ -69,6 +69,7 @@ class woo_shop_hacker_builder {
 
 	// Product HTML
 	static function print_product( $product ) {
+		global $wpdb;
 
 		// Get Description
 		$description = '';
@@ -78,13 +79,24 @@ class woo_shop_hacker_builder {
 			}
 		}
 
+		// Disablement
+		$product_match = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_sku' AND meta_value = 'SH-%d' LIMIT 1",
+				$product->id
+			)
+		);
+		$disabled = $product_match ? 'disabled="disabled"' : '';
+		$title = $product_match ? __( 'This product exists in your store', 'woo-shop-hacker' ) : '';
+
 		// Output
 		echo sprintf(
 			'
 				<dt>
 					<label>
-						<input type="checkbox" name="add_product[]" value="%d" /> <strong>%s</strong>
-						<a href="#" onclick="jQuery( \'#pop%d\' ).toggle( \'slow\' ); return false;" class="dashicons dashicons-sort"></a><br />
+						<input type="checkbox" name="add_product[]" value="%d" title="%s" %s /> <strong>%s</strong>
+						<a href="#" onclick="jQuery( \'#pop%d\' ).toggle( \'slow\' ); return false;"
+							class="dashicons dashicons-sort"></a><br />
 					</label>
 				</dt>
 				<dd>
@@ -93,6 +105,8 @@ class woo_shop_hacker_builder {
 				</dd>
 			',
 			$product->id,
+			$title,
+			$disabled,
 			trim( $product->name ),
 			$product->id,
 			$product->bundle_headline,
