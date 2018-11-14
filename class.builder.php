@@ -27,7 +27,15 @@ class woo_shop_hacker_builder {
 		// Get Search Results
 		$query = isset( $_REQUEST['query'] ) ? sanitize_text_field( $_REQUEST['query'] ) : '';
 		$page = isset( $_REQUEST['paginate'] ) ? intval( $_REQUEST['paginate'] ) : 1;
-		$products = $query ? self::run_search( $query, $page ) : [];
+		if( $query ) {
+			$response = woo_shop_hacker_api::get_search_results( $query, $page );
+			$products = isset( $response->products ) ? $response->products : [];
+		}
+
+		// Get Meta Data
+		$meta = isset( $response->meta ) ? $response->meta : '';
+		self::$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
+		self::$total_records = isset( $meta->total_records ) ? intval( $meta->total_records ) : 0;
 
 		// Get Pagination
 		$pagination = [ sprintf( 'Page: %d of %d', $page, self::$total_pages ) ];
@@ -94,23 +102,6 @@ class woo_shop_hacker_builder {
 			$product->id,
 			$description
 		);
-	}
-
-
-	// Search Processor
-	static function run_search( $query, $page ) {
-
-		// Run Query
-		$response = woo_shop_hacker_api::get_search_results( $query, $page );
-		$products = isset( $response->products ) ? $response->products : [];
-
-		// Get Meta Data
-		$meta = isset( $response->meta ) ? $response->meta : '';
-		self::$total_pages = isset( $meta->total_pages ) ? intval( $meta->total_pages ) : 0;
-		self::$total_records = isset( $meta->total_records ) ? intval( $meta->total_records ) : 0;
-
-		// Return Products
-		return $products;
 	}
 
 
