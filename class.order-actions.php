@@ -4,7 +4,7 @@
 class woo_shop_hacker_order_actions {
 
 
-	// Add a custom action to order actions select box on edit order page
+	// Add Custom Order Action
 	static function woocommerce_order_actions( $actions ) {
 		global $theorder;
 
@@ -55,22 +55,27 @@ class woo_shop_hacker_order_actions {
 				$order->get_billing_email()
 			);
 
-$order->add_order_note( print_r( $response, true ) );
+			// Handle Bad Response
+			if( ! intval( $response ) ) {
+				$message =
+					sprintf(
+						__( 'Sorry, there was an error sending your order of %s to Shop Hacker for fulfillment. Please try again later or contact support for assistance.', 'woo-shop-hacker' ),
+						$product->get_title()
+					) . "\n\n" . $response;
+				$order->add_order_note( $message );
+				continue;
+			}
 
+			// Order Note
+			$message = sprintf(
+				__( 'Sent order for %s to Shop Hacker for fulfillment.', 'woo-shop-hacker' ),
+				$product->get_title()
+			);
+			$order->add_order_note( $message );
+
+			// Mark Order As Transmitted
+			update_post_meta( $order->get_id(), '_shop_hacker_sent', 'yes' );
 		}
-
-		// Handle Bad Response
-		if( ! intval( $response ) ) { return false; }
-
-		// Order Note
-		$message = sprintf(
-			__( 'Order information sent to Shop Hacker for fulfillment.', 'woo-shop-hacker' ),
-			wp_get_current_user()->display_name
-		);
-		$order->add_order_note( $message );
-
-		// Mark As Transmitted
-		update_post_meta( $order->get_id(), '_shop_hacker_sent', 'yes' );
 	}
 
 

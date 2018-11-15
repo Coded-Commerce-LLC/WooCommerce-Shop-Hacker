@@ -86,7 +86,7 @@ class woo_shop_hacker_api {
 
 		// Verify Required Data
 		if( ! $productID || ! $name || ! $email ) {
-			return false;
+			return MISSING_DATA;
 		}
 
 		// Assemble Order Request
@@ -108,16 +108,15 @@ class woo_shop_hacker_api {
 
 		// Handle Bad Response
 		if( is_wp_error( $response ) || empty( $response['body'] ) ) {
-			echo sprintf(
-				'<div class="notice notice-error"><p>%s</p></div>',
-				print_r( $response, true )
-			);
-			return print_r( $response, true ); //false;
+			return sprintf( "%s\n\n%s\n\n%s", $url, print_r( $args, true ), print_r( $response, true ) );
+		}
+		$response_body = json_decode( $response['body'] );
+		if( empty( $response_body->sale_builder_id ) ) {
+			return sprintf( "%s%s%s", $url, print_r( $args, true ), print_r( $response['body'], true ) );
 		}
 
 		// Handle Good Response
-		$response = json_decode( $response['body'] );
-		return isset( $response->sale_builder_id ) ? intval( $response->sale_builder_id ) : false;
+		return isset( $response->sale_builder_id ) ? intval( $response->sale_builder_id ) : MISSING_RESPONSE_ID;
 	}
 
 
