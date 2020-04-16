@@ -3,7 +3,7 @@ Contributors: seanconklin
 Donate link: https://codedcommerce.com/donate
 Tags: WooCommerce, Shop Hacker, digital products, elearning courses, import products
 Requires at least: 4.0.1
-Tested up to: 5.0
+Tested up to: 5.4
 Requires PHP: 5.6
 Stable tag: 1.0
 License: GPLv3 or later
@@ -13,7 +13,7 @@ Connects WooCommerce with Shop Hacker API so you can add 1000s of digital produc
 
 == Description ==
 
-[youtube https://www.youtube.com/watch?v=9JAz9VNdsCs]
+[youtube https://www.youtube.com/watch?v=65bsGl-Q9S8]
 
 Shop Hacker allows you to easily import digital products such as elearning courses, software, and games directly into your ecommerce store.
 
