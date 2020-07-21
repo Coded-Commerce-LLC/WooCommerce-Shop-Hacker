@@ -101,7 +101,7 @@ class woo_shop_hacker_api {
 				'shop_hacker_product_id' => $productID,
 			]
 		];
-		$args['body'] = json_encode( $body );
+		$args['body'] = json_decode( json_encode( $body ) );
 
 		// Transmit Order
 		$response = wp_remote_post( $url, $args );
@@ -116,7 +116,7 @@ class woo_shop_hacker_api {
 		}
 
 		// Handle Good Response
-		return isset( $response->sale_builder_id ) ? intval( $response->sale_builder_id ) : MISSING_RESPONSE_ID;
+		return intval( $response_body->sale_builder_id );
 	}
 
 
